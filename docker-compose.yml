@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  octopus-deploy:
+    image: octopusdeploy/octopusdeploy:latest
+    container_name: OctopusDeploy
+    ports:
+      - "1322:8080"
+    environment:
+      ACCEPT_EULA: "Y"
+      DB_CONNECTION_STRING: "Server=db, 1433; Database=octopus;User Id=SA;Password=YourStrong!Passw0rd;"
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - wingsfinnet
+    volumes:
+      - ./local-data:/data
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sql-server
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - wingsfinnet
+    volumes:
+      - ./sql-data:/var/opt/mssql
+
+networks:
+  wingsfinnet:
+    external: true
+    name: wingsfinnet
